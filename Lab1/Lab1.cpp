@@ -23,13 +23,6 @@ public:
     double get_y() const {
         return y;
     }
-
-//    Point &move(double x, double y) {
-//        this->x += x;
-//        this->y += y;
-//        return *this;
-//    }
-
 };
 
 class Perimeter {
@@ -155,7 +148,42 @@ public:
     }
 };
 
-class Trapezoid {
+class Trapezoid : public Polygon {  // check for slope:  (y2-y1)/(x2-x1)
+public:                             // if two slopes are same and other two not -> trapezoid
+    Trapezoid(const PointList &points) : Polygon{points} {
+        if (points.size() != 4)
+            throw std::logic_error{"Not a trapezoid!"};
+
+        int checkTrapezoid = 0;
+        double checkSlope1 = (points[1].get_y() - points[0].get_y()) / (points[1].get_x() - points[0].get_x());
+        double checkSlope2 = (points[3].get_y() - points[2].get_y()) / (points[3].get_x() - points[2].get_x());
+        if (checkSlope1 != checkSlope2)
+            checkTrapezoid++;
+        checkSlope1 = (points[2].get_y() - points[1].get_y()) / (points[2].get_x() - points[1].get_x());
+        checkSlope2 = (points[4].get_y() - points[3].get_y()) / (points[4].get_x() - points[3].get_x());
+        if (checkSlope1 != checkSlope2)
+            checkTrapezoid++;
+
+        if (checkTrapezoid != 1)
+            throw std::logic_error{"Not a trapezoid!"};
+
+    }
+
+    Trapezoid(const Trapezoid &trapezoid) : Trapezoid{trapezoid.points} {}
+
+    Trapezoid &operator=(const Trapezoid &trapezoid) {
+        if (this == &trapezoid)
+            return *this;
+        points = trapezoid.points;
+        return *this;
+    }
+
+    double getArea() const override {
+        double area = 0;
+        area += Triangle{PointList{points.begin(), points.begin() + 3}}.getArea();
+        area += Triangle{PointList{points[0], points[3], points[2]}}.getArea();
+        return area;
+    }
 };
 
 class RegularPolygon {
@@ -168,7 +196,10 @@ int main() {
     Polygon polygon{points};
     PointList triPoints{Point{1, 0}, Point{3.5, 0}, Point{1.847, 2.375}};
     Triangle triangle{triPoints};
+    PointList trapPoints{Point{-3, -3}, Point{5, 1}, Point{10, -2}, Point{-4, -9}};
+    Trapezoid trapezoid{trapPoints};
     std::cout << polyline.getPerimeter() << closedPolyline.getPerimeter() << polygon.getArea()
-              << polygon.getPerimeter() << "trianglep" << triangle.getPerimeter() << "triangles" << triangle.getArea();
+              << polygon.getPerimeter() << "trianglep" << triangle.getPerimeter() << "triangles"
+              << triangle.getArea() << "trappppp" << trapezoid.getPerimeter() << "trapssss" << trapezoid.getArea();
     return 0;
 }
