@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <math.h>
 
 class Point {
 private:
@@ -31,16 +32,19 @@ public:
 
 };
 
-class FigureMethods {
+class Perimeter {
 protected:
-    virtual double getSquare() const = 0;
-
     virtual double getPerimeter() const = 0;
+};
+
+class Area {
+protected:
+    virtual double getArea() const = 0;
 };
 
 using PointList = std::vector<Point>;
 
-class Polyline : public FigureMethods {
+class Polyline : public Perimeter {
 private:
     PointList points;
 public:
@@ -51,6 +55,18 @@ public:
             return *this;
         points = polyline.points;
         return *this;
+    }
+
+    double getPerimeter() const override {
+        double perimeter = 0;
+        if (points.empty())
+            return 0;
+//        TODO не робит периметер!!!!!!!!!!!
+//        for (int i = 0; i < points.size() - 1; i++) {
+//            double dx = points[i].get_x() - points[i + 1].get_x();
+//            double dy = points[i].get_y() - points[i + 1].get_y();
+//            perimeter += sqrt(dx * dx + dy * dy);
+//        }
     }
 };
 
@@ -67,5 +83,8 @@ class RegularPolygon {
 };
 
 int main() {
+    PointList points{Point{0, 0}, Point{1, 0}};
+    Polyline polyline{points};
+    std::cout << polyline.getPerimeter();
     return 0;
 }
