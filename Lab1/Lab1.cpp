@@ -45,7 +45,7 @@ protected:
 using PointList = std::vector<Point>;
 
 class Polyline : public Perimeter {
-private:
+protected:
     PointList points;
 public:
     Polyline(const PointList &pointList) : points{pointList} {}     // конструктор
@@ -70,7 +70,56 @@ public:
     }
 };
 
-class Polygon {
+class ClosedPolyline : public Polyline {
+public:
+    ClosedPolyline(const PointList &points) : Polyline{points} {}
+
+    ClosedPolyline(const ClosedPolyline &closedPolyline) : Polyline{closedPolyline.points} {}
+
+    ClosedPolyline &operator=(const ClosedPolyline &closedPolyline) {
+        if (this == &closedPolyline)
+            return *this;
+        points = closedPolyline.points;
+        return *this;
+    }
+
+    double getPerimeter() const override {
+        double perimeter;
+        if (points.empty())
+            return 0;
+        for (int i = 0; i < points.size() - 1; i++) {
+            double dx = points[i].get_x() - points[i + 1].get_x();
+            double dy = points[i].get_y() - points[i + 1].get_y();
+            perimeter += sqrt(dx * dx + dy * dy);
+        }
+        return perimeter + sqrt((points.front().get_x() - points.back().get_x()) *
+                                (points.front().get_x() - points.back().get_x()) +
+                                (points.front().get_y() - points.back().get_y()) *
+                                (points.front().get_y() - points.back().get_y()));
+    }
+};
+
+class Polygon : public ClosedPolyline, public Area {
+public:
+    Polygon(const PointList &points) : ClosedPolyline{points} {}
+
+    Polygon(const Polygon &polygon) : Polygon{polygon.points} {}
+
+    Polygon &operator=(const Polygon &polygon) {
+        if (this == &polygon)
+            return *this;
+        points = polygon.points;
+        return *this;
+    }
+
+    double getArea() const override {
+        double res1, res2;
+        for (int i = 0; i < points.size() - 1; i++) {
+            res1 += points[i].get_x() * points[i + 1].get_y();
+            res2 += points[i + 1].get_x() * points[i].get_y();
+        }
+        return (abs(res1 - res2)) / 2;
+    }
 };
 
 class Triangle {
@@ -83,8 +132,10 @@ class RegularPolygon {
 };
 
 int main() {
-    PointList points{Point{0, 0}, Point{1, 0}, Point{1, 1}};
+    PointList points{Point{0, 0}, Point{1, 0}, Point{1, 1}, Point{0, 1}};
     Polyline polyline{points};
-    std::cout << polyline.getPerimeter();
+    ClosedPolyline closedPolyline{points};
+    Polygon polygon{points};
+    std::cout << polyline.getPerimeter() << closedPolyline.getPerimeter() << polygon.getArea();
     return 0;
 }
