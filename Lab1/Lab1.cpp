@@ -122,7 +122,37 @@ public:
     }
 };
 
-class Triangle {
+class Triangle : public Polygon {
+public:
+    Triangle(const PointList &points) : Polygon{points} {
+        if (points.size() != 3) {
+            throw std::logic_error{"Not a triangle!"};
+        }
+    }
+
+    Triangle(const Triangle &triangle) : Triangle{triangle.points} {}
+
+    Triangle &operator=(const Triangle &triangle) {
+        if (this == &triangle)
+            return *this;
+        points = triangle.points;
+        return *this;
+    }
+
+    double getArea() const override {
+        std::vector<double> sides(3);
+        double dx1 = points[0].get_x() - points[1].get_x();
+        double dy1 = points[0].get_y() - points[1].get_y();
+        sides[0] = sqrt(dx1 * dx1 + dy1 * dy1);
+        double dx2 = points[1].get_x() - points[2].get_x();
+        double dy2 = points[1].get_y() - points[2].get_y();
+        sides[1] = sqrt(dx2 * dx2 + dy2 * dy2);
+        double dx3 = points[0].get_x() - points[2].get_x();
+        double dy3 = points[0].get_y() - points[2].get_y();
+        sides[2] = sqrt(dx3 * dx3 + dy3 * dy3);
+        double perimeter = this->getPerimeter() / 2;
+        return sqrt(perimeter * (perimeter - sides[0]) * (perimeter - sides[1]) * (perimeter - sides[2]));
+    }
 };
 
 class Trapezoid {
@@ -136,6 +166,9 @@ int main() {
     Polyline polyline{points};
     ClosedPolyline closedPolyline{points};
     Polygon polygon{points};
-    std::cout << polyline.getPerimeter() << closedPolyline.getPerimeter() << polygon.getArea();
+    PointList triPoints{Point{1, 0}, Point{3.5, 0}, Point{1.847, 2.375}};
+    Triangle triangle{triPoints};
+    std::cout << polyline.getPerimeter() << closedPolyline.getPerimeter() << polygon.getArea()
+              << polygon.getPerimeter() << "trianglep" << triangle.getPerimeter() << "triangles" << triangle.getArea();
     return 0;
 }
