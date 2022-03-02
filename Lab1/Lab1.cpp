@@ -61,12 +61,12 @@ public:
         double perimeter = 0;
         if (points.empty())
             return 0;
-//        TODO не робит периметер!!!!!!!!!!!
-//        for (int i = 0; i < points.size() - 1; i++) {
-//            double dx = points[i].get_x() - points[i + 1].get_x();
-//            double dy = points[i].get_y() - points[i + 1].get_y();
-//            perimeter += sqrt(dx * dx + dy * dy);
-//        }
+        for (int i = 0; i < points.size() - 1; i++) {
+            double dx = points[i].get_x() - points[i + 1].get_x();
+            double dy = points[i].get_y() - points[i + 1].get_y();
+            perimeter += sqrt(dx * dx + dy * dy);
+        }
+        return perimeter;
     }
 };
 
@@ -83,7 +83,7 @@ class RegularPolygon {
 };
 
 int main() {
-    PointList points{Point{0, 0}, Point{1, 0}};
+    PointList points{Point{0, 0}, Point{1, 0}, Point{1, 1}};
     Polyline polyline{points};
     std::cout << polyline.getPerimeter();
     return 0;
