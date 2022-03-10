@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 class Point {
 private:
@@ -42,7 +42,9 @@ protected:
     PointList points;
 public:
     Polyline(const PointList &pointList) : points{pointList} {}     // конструктор
+
     Polyline(const Polyline &polyline) : points{polyline.points} {} // копирование
+
     Polyline &operator=(const Polyline &polyline) {                 // присваивание
         if (this == &polyline)
             return *this;
@@ -186,7 +188,45 @@ public:                             // if two slopes are same and other two not 
     }
 };
 
-class RegularPolygon {
+class RegularPolygon : public Polygon {
+public:
+    RegularPolygon(const PointList &points) : Polygon{points} {
+        int centerX = 0;
+        int centerY = 0;
+        for (int i = 0; i < points.size(); i++) {
+            centerX = centerX + points[i].get_x();
+            centerY = centerY + points[i].get_y();
+        }
+        centerX = centerX / points.size();
+        centerY = centerY / points.size();
+        for (int i = 0; i < points.size() - 1; i++) {
+            double dx1 = points[i].get_x() - centerX;
+            double dy1 = points[i].get_y() - centerY;
+            double dx2 = points[i + 1].get_x() - centerX;
+            double dy2 = points[i + 1].get_y() - centerY;
+            double dist1 = sqrt(dx1 * dx1 + dy1 * dy1);
+            double dist2 = sqrt(dx2 * dx2 + dy2 * dy2);
+            if (!(dist1 == dist2))
+                throw std::logic_error{"Not a regular polygon!"};
+        }
+    }
+
+    RegularPolygon(const RegularPolygon &regularPolygon) : RegularPolygon{regularPolygon.points} {}
+
+    RegularPolygon &operator=(const RegularPolygon &regularPolygon) {
+        if (this == &regularPolygon)
+            return *this;
+        points = regularPolygon.points;
+        return *this;
+    }
+
+    double getArea() const override {
+        double dx = points[0].get_x() - points[1].get_x();
+        double dy = points[0].get_y() - points[1].get_y();
+        double length = sqrt(dx * dx + dy * dy);
+        return ((length * points.size() * (length / (2 * tan(3.14159265359 / points.size())))) / 2);
+    }
+
 };
 
 int main() {
@@ -198,8 +238,14 @@ int main() {
     Triangle triangle{triPoints};
     PointList trapPoints{Point{-3, -3}, Point{5, 1}, Point{10, -2}, Point{-4, -9}};
     Trapezoid trapezoid{trapPoints};
-    std::cout << polyline.getPerimeter() << closedPolyline.getPerimeter() << polygon.getArea()
-              << polygon.getPerimeter() << "trianglep" << triangle.getPerimeter() << "triangles"
-              << triangle.getArea() << "trappppp" << trapezoid.getPerimeter() << "trapssss" << trapezoid.getArea();
+    PointList reg{Point{-1, -1}, Point{-1, 1}, Point{1, 1}, Point{1, -1}};
+    RegularPolygon regularPolygon{reg};
+    std::cout << "Polyline Perimeter is " << polyline.getPerimeter() << "\nClosed Polyline Perimeter is "
+              << closedPolyline.getPerimeter() << "\nPolygon Perimeter is "
+              << polygon.getPerimeter() << "\nPolygon Area is " << polygon.getArea() << "\nTriangle Perimeter is "
+              << triangle.getPerimeter() << "\nTriangle Area is "
+              << triangle.getArea() << "\nTrapezoid Perimeter is " << trapezoid.getPerimeter() << "\nTrapezoid Area is "
+              << trapezoid.getArea() << "\nRegular Polygon Perimeter is " << regularPolygon.getPerimeter()
+              << "\nRegular Polygon Area is " << regularPolygon.getArea();
     return 0;
 }
