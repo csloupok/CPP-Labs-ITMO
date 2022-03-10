@@ -223,8 +223,8 @@ public:
     double getArea() const override {
         double dx = points[0].get_x() - points[1].get_x();
         double dy = points[0].get_y() - points[1].get_y();
-        double length = sqrt(dx * dx + dy * dy);
-        return ((length * points.size() * (length / (2 * tan(3.14159265359 / points.size())))) / 2);
+        double dist = sqrt(dx * dx + dy * dy);
+        return ((dist * points.size() * (dist / (2 * tan(3.14159265359 / points.size())))) / 2);
     }
 
 };
