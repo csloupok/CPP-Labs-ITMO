@@ -35,10 +35,25 @@ public:
         return !operator==(polynomial);
     }
 
-    Polynomial operator-() const {
+    Polynomial operator+(const Polynomial &polynomial) const {}
 
-    }
+    Polynomial operator-(const Polynomial &polynomial) const;
 
+    Polynomial operator*(const Polynomial &polynomial) const;
+
+    Polynomial operator/(double denominator) const;
+
+    Polynomial &operator+=(const Polynomial &polynomial);
+
+    Polynomial &operator-=(const Polynomial &polynomial);
+
+    Polynomial &operator*=(const Polynomial &polynomial);
+
+    Polynomial &operator/=(double denominator);
+
+    Polynomial operator<<(uint8_t shift) const;
+
+    Polynomial operator>>(uint8_t shift) const;
 };
 
 int main() {
