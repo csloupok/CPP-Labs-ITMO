@@ -103,5 +103,5 @@ public:
 };
 
 int main() {
-
+//    Polynomial first{CoefficientList{3, 5, 0, -11}};
 }
