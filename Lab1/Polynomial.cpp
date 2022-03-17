@@ -12,7 +12,7 @@ using CoefficientList = std::vector<double>;
 //6. [] (для получения коэффициента i-го члена)
 
 class Polynomial {
-private:
+public:
     CoefficientList coefficients;
 public:
     Polynomial(const CoefficientList &c) : coefficients{c} {}
@@ -40,6 +40,7 @@ public:
         Polynomial sum = *this;
         for (size_t i = 0; i < min_size; i++)
             sum.coefficients[i] += polynomial.coefficients[i];
+        return sum;
     }
 
     Polynomial operator-(const Polynomial &polynomial) const {
@@ -47,13 +48,17 @@ public:
         Polynomial difference = *this;
         for (size_t i = 0; i < min_size; i++)
             difference.coefficients[i] -= polynomial.coefficients[i];
+        return difference;
     }
 
     Polynomial operator*(const Polynomial &polynomial) const {
-        size_t const min_size = std::min(coefficients.size(), polynomial.coefficients.size());
-        Polynomial composition = *this;
-        for (size_t i = 0; i < min_size; i++)
-            composition.coefficients[i] *= polynomial.coefficients[i];
+        size_t pol_size = coefficients.size() + polynomial.coefficients.size();
+        std::vector<double> pol(pol_size);
+        for (size_t i = 0; i != coefficients.size(); ++i) {
+            for (size_t j = 0; j != polynomial.coefficients.size(); ++j)
+                pol[i + j + 1] += (*this)[i] * polynomial[j];
+        }
+        return Polynomial{pol};
     }
 
     Polynomial operator/(double denominator) const {
@@ -97,28 +102,6 @@ public:
             return *this;
     }
 
-    Polynomial operator<<(uint8_t shift) const {
-        if (shift >= coefficients.size())
-            return *this;
-        Polynomial shifted = *this;
-        for (size_t i = 0; i < coefficients.size() - shift; ++i)
-            shifted.coefficients[i] = coefficients[i + shift];
-        for (size_t i = coefficients.size() - shift; i < coefficients.size(); ++i)
-            shifted.coefficients[i] = coefficients[i - (coefficients.size() - shift)];
-        return shifted;
-    }
-
-    Polynomial operator>>(uint8_t shift) const {
-        if (shift >= coefficients.size())
-            return *this;
-        Polynomial shifted = *this;
-        for (size_t i = 0; i < shift; ++i)
-            shifted.coefficients[i] = coefficients[i + (coefficients.size() - shift)];
-        for (size_t i = shift; i < coefficients.size(); ++i)
-            shifted.coefficients[i] = coefficients[i - shift];
-        return shifted;
-    }
-
     double operator[](size_t number) const {
         if (number >= 0 && number < coefficients.size())
             return coefficients[number];
@@ -127,6 +110,36 @@ public:
     }
 };
 
+std::ostream &operator<<(std::ostream &output, Polynomial &a) {
+    for (int i = 0; i < a.coefficients.size(); ++i) {
+        if (a[i] == 0)
+            i++;
+        output << a[i] << "x" << i + 1;
+        if ((i + 1) != a.coefficients.size()) {
+            output << " + ";
+        }
+    }
+    return output;
+}
+
 int main() {
-//    Polynomial first{CoefficientList{3, 5, 0, -11}};
+    Polynomial p1{CoefficientList{2, 2, 44, 2}};
+    std::cout << p1 << std::endl;
+
+    Polynomial p2{{1, 22, 4, 1}};
+    std::cout << p2 << std::endl;
+
+    Polynomial p3 = p1 * p2;
+    std::cout << p3 << std::endl;
+
+    Polynomial p4 = p1 + p2;
+    std::cout << p4 << std::endl;
+
+    Polynomial p5 = p2 - p1;
+    std::cout << p5 << std::endl;
+
+    Polynomial p6 = p1 / 2;
+    std::cout << p6 << std::endl;
+
+    return 0;
 }
