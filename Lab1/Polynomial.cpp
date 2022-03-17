@@ -110,6 +110,25 @@ public:
     }
 };
 
+std::istream &operator >> (std::istream &input, Polynomial &a)
+{
+    int index;
+    while (index >= a.coefficients.size());
+    {
+        std::cin >> index;
+        if (index >= a.coefficients.size())
+            std::cout << "Wrong argument!" << "\n";
+    }
+    int number;
+    if (input >> number) {
+        a.coefficients[index - 1] = number;
+    } else {
+        std::cout << "Error" << "\n";
+        exit(1);
+    }
+    return input;
+}
+
 std::ostream &operator<<(std::ostream &output, Polynomial &a) {
     for (int i = 0; i < a.coefficients.size(); ++i) {
         if (a[i] == 0)
@@ -140,6 +159,7 @@ int main() {
 
     Polynomial p6 = p1 / 2;
     std::cout << p6 << std::endl;
-
+    std::cin >> p6;
+    std::cout << p6 << std::endl;
     return 0;
 }
