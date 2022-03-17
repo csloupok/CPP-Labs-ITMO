@@ -58,11 +58,11 @@ public:
 
     Polynomial operator/(double denominator) const {
         if (denominator != 0) {
-            Polynomial result = *this;
-            for (size_t i = 0; i < result.coefficients.size(); ++i) {
-                result.coefficients[i] /= denominator;
+            Polynomial quotient = *this;
+            for (size_t i = 0; i < quotient.coefficients.size(); ++i) {
+                quotient.coefficients[i] /= denominator;
             }
-            return result;
+            return quotient;
         } else
             return *this;
     }
@@ -97,9 +97,34 @@ public:
             return *this;
     }
 
-    Polynomial operator<<(uint8_t shift) const;
+    Polynomial operator<<(uint8_t shift) const {
+        if (shift >= coefficients.size())
+            return *this;
+        Polynomial shifted = *this;
+        for (size_t i = 0; i < coefficients.size() - shift; ++i)
+            shifted.coefficients[i] = coefficients[i + shift];
+        for (size_t i = coefficients.size() - shift; i < coefficients.size(); ++i)
+            shifted.coefficients[i] = coefficients[i - (coefficients.size() - shift)];
+        return shifted;
+    }
 
-    Polynomial operator>>(uint8_t shift) const;
+    Polynomial operator>>(uint8_t shift) const {
+        if (shift >= coefficients.size())
+            return *this;
+        Polynomial shifted = *this;
+        for (size_t i = 0; i < shift; ++i)
+            shifted.coefficients[i] = coefficients[i + (coefficients.size() - shift)];
+        for (size_t i = shift; i < coefficients.size(); ++i)
+            shifted.coefficients[i] = coefficients[i - shift];
+        return shifted;
+    }
+
+    double operator[](size_t number) const {
+        if (number >= 0 && number < coefficients.size())
+            return coefficients[number];
+        else
+            throw std::logic_error("Wrong number!");
+    }
 };
 
 int main() {
