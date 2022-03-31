@@ -19,7 +19,12 @@ void finish(int temp) {
     std::cout << "\n---Медианные значения валют за время работы программы:---\n\n";
     for (int i = 0; i < valutes.size(); i++) {
         std::sort(valutes[i].begin(), valutes[i].end());
-        std::cout << valutesNames[i] << ": " << valutes[i][(int) (valutes[i].size() / 2)] << " руб.\n";
+        if (valutes[i].size() % 2 != 0)
+            std::cout << valutesNames[i] << ": " << valutes[i][(int) (valutes[i].size() / 2) - 1] << " руб.\n";
+        else
+            std::cout << valutesNames[i] << ": "
+                      << (valutes[i][(int) (valutes[i].size() / 2)] + valutes[i][(int) (valutes[i].size() / 2) - 1]) / 2
+                      << " руб.\n";
     }
 
     std::exit(0);
@@ -36,9 +41,10 @@ void parser(std::string file) {
     auto JsonData = json::parse(file);
     int counter = 0;
     for (auto&[key, value]: JsonData["Valute"].items()) {
-        valutes[counter].push_back(value["Value"]);
+        valutes[counter].push_back(value["Value"].get<double>() / value["Nominal"].get<int>());
         counter += 1;
-        std::cout << key << " " << value["Name"].get<std::string>() << ": " << value["Value"] << " руб.\n";
+        std::cout << key << " " << value["Name"].get<std::string>() << ": "
+                  << value["Value"].get<double>() / value["Nominal"].get<int>() << " руб.\n";
     }
     std::cout << "\n";
 }
